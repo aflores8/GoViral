@@ -126,29 +126,34 @@ public class CameraOpen extends AppCompatActivity {
                 final SparseArray<TextBlock> items = detections.getDetectedItems();
                 if(items.size() != 0)
                 {
+                    Log.d("Size of items", "size of items: " + Float.toString(items.size()));
                     textView.post(new Runnable() {
                         public void run() {
                             StringBuilder stringBuilder = new StringBuilder();
-                            Text ingredientsElem = null;
+                            boolean foundIngredients = false;
                             for(int i = 0; i < items.size(); i++) {
                                 TextBlock item = items.valueAt(i);
+                                Log.d("ITEM " + Float.toString(i), item.getValue());
                                 for (Text line: item.getComponents()) {
-                                    for (Text elem: line.getComponents()) {
-                                        if(elem.getValue().toLowerCase().contains("ingredients")) {
-                                            ingredientsElem = line;
-                                            break;
+                                    Log.d("ELEM", line.getValue() );
+                                    if(foundIngredients == false) {
+                                        if(line.getValue().toLowerCase().contains("ingredients")) {
+                                            foundIngredients = true;
                                         }
                                     }
-                                    if(ingredientsElem != null) {
-                                        stringBuilder.append(item.getValue());
-                                        stringBuilder.append("\n");
+                                    if(foundIngredients == true) {
+                                        for (Text elem : line.getComponents()) {
+                                            if(!elem.getValue().toLowerCase().contains("ingredients")) {
+                                                stringBuilder.append(elem.getValue() + " ");
+                                            }
+                                        }
                                     }
                                 }
                             }
-                            if(ingredientsElem != null) {
-                                textView.setText(stringBuilder.toString());
+                            if(stringBuilder.toString() != "") {
+                                textView.setText("Potential Ingredients: " + stringBuilder.toString());
+                                Log.d("STRINGBUILT", stringBuilder.toString());
                             }
-
                         }
                     });
                 }
